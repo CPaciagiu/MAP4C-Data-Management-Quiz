@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAP4C Data Management Quiz</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.6;
+  }
+  header {
+    background: #173b70;
+    color: white;
+    padding: 28px 18px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 8px; }
+  main { max-width: 850px; margin: 24px auto; padding: 0 16px; }
+  .panel, .question {
+    background: white;
+    padding: 22px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #0000000d;
+  }
+  .tag {
+    color: #1d4ed8;
+    font-weight: bold;
+    font-size: .85rem;
+    text-transform: uppercase;
+  }
+  .option {
+    display: block;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    margin: 8px 0;
+    cursor: pointer;
+  }
+  .option:hover { background: #eff6ff; }
+  .option:has(input:checked) {
+    border-color: #2563eb;
+    background: #eff6ff;
+  }
+  input[type="radio"] { margin-right: 9px; }
+  button {
+    background: #1d4ed8;
+    color: white;
+    border: 0;
+    padding: 13px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button:hover { background: #1e40af; }
+  button:focus-visible, input:focus-visible {
+    outline: 3px solid #f59e0b;
+    outline-offset: 3px;
+  }
+  button:disabled { background: #64748b; cursor: default; }
+  #result { display: none; }
+  .feedback { margin-top: 12px; padding: 12px; border-radius: 8px; }
+  .correct { background: #dcfce7; color: #166534; }
+  .incorrect { background: #fee2e2; color: #991b1b; }
+  progress { width: 100%; height: 12px; }
+  .muted { color: #64748b; }
+  footer { text-align: center; padding: 24px; color: #64748b; }
+</style>
+</head>
+<body>
+<header>
+  <h1>MAP4C Data Management</h1>
+  <p>Interactive Practice Quiz</p>
+  <p>One-Variable and Two-Variable Data</p>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Welcome, students!</h2>
+    <p>Test your understanding of statistics, measures of central
+    tendency, scatter plots, correlation and lines of best fit.</p>
+    <p><strong>Instructions:</strong> Choose one answer for each
+    question. Submit your quiz to see your score and explanations.</p>
+    <p id="progressText">0 of 10 questions answered</p>
+    <progress id="progress" value="0" max="10"
+      aria-label="Questions answered"></progress>
+  </section>
+
+  <form id="quiz">
+    <div id="questions"></div>
+    <button type="submit" id="submit">Submit Quiz</button>
+  </form>
+
+  <section class="panel" id="result" aria-live="polite" tabindex="-1">
+    <h2>Your Results</h2>
+    <p id="score"></p>
+    <p id="message"></p>
+    <button type="button" id="retry">Try Again</button>
+  </section>
+</main>
+
+<footer>MAP4C • Data Management • Practice and Review</footer>
+
+<script>
+const questions = [
+  {
+    topic: "One-variable data",
+    q: "A teacher records the heights of 25 students. How many variables are being studied?",
+    options: ["One", "Two", "Three", "Twenty-five"],
+    answer: 0,
+    explain: "Height is one variable. The 25 students are the observations."
+  },
+  {
+    topic: "Mean",
+    q: "Find the mean of 4, 6, 6, 8 and 11.",
+    options: ["6", "7", "8", "35"],
+    answer: 1,
+    explain: "The sum is 35. Divide by 5 values: 35 ÷ 5 = 7."
+  },
+  {
+    topic: "Median",
+    q: "What is the median of 3, 5, 7, 9, 14 and 18?",
+    options: ["7", "8", "9", "56"],
+    answer: 1,
+    explain: "There are six values. Average the two middle values: (7 + 9) ÷ 2 = 8."
+  },
+  {
+    topic: "Range",
+    q: "A data set has a minimum of 12 and a maximum of 31. What is its range?",
+    options: ["12", "19", "31", "43"],
+    answer: 1,
+    explain: "Range = maximum − minimum = 31 − 12 = 19."
+  },
+  {
+    topic: "Measures of central tendency",
+    q: "Which measure represents the value that appears most frequently?",
+    options: ["Mean", "Median", "Mode", "Range"],
+    answer: 2,
+    explain: "The mode is the value that occurs most frequently."
+  },
+  {
+    topic: "Two-variable data",
+    q: "As hours spent studying increase, test marks generally increase. What type of correlation is this?",
+    options: ["Negative", "Positive", "No correlation", "Zero variation"],
+    answer: 1,
+    explain: "Positive correlation means that larger values of one variable tend to accompany larger values of the other."
+  },
+  {
+    topic: "Scatter plots",
+    q: "What is the main purpose of a scatter plot?",
+    options: [
+      "To display the relationship between two variables",
+      "To calculate the mode automatically",
+      "To show only one data value",
+      "To arrange categories alphabetically"
+    ],
+    answer: 0,
+    explain: "Each point represents a pair of values, helping us investigate the relationship between two variables."
+  },
+  {
+    topic: "Lines of best fit",
+    q: "A line of best fit is y = 3x + 5. What value of y is predicted when x = 4?",
+    options: ["12", "17", "20", "9"],
+    answer: 1,
+    explain: "Substitute x = 4: y = 3(4) + 5 = 17."
+  },
+  {
+    topic: "Correlation and causation",
+    q: "True or false: A strong correlation proves that one variable causes the other.",
+    options: ["True", "False"],
+    answer: 1,
+    explain: "Correlation alone does not prove causation. Other variables or coincidence may explain the relationship."
+  },
+  {
+    topic: "Interpreting data",
+    q: "A researcher records each student's height and arm span. What type of analysis is appropriate for investigating their relationship?",
+    options: [
+      "One-variable analysis only",
+      "Two-variable analysis",
+      "Finding the mode only",
+      "Calculating the range only"
+    ],
+    answer: 1,
+    explain: "Height and arm span are two quantitative variables. Paired observations can be plotted to investigate their relationship."
+  }
+];
+
+const container = document.getElementById("questions");
+const form = document.getElementById("quiz");
+const progress = document.getElementById("progress");
+const progressText = document.getElementById("progressText");
+const result = document.getElementById("result");
+let submitted = false;
+
+function renderQuiz() {
+  container.replaceChildren();
+  result.style.display = "none";
+  submitted = false;
+  document.getElementById("submit").disabled = false;
+
+  questions.forEach((item, i) => {
+    const card = document.createElement("section");
+    card.className = "question";
+
+    const tag = document.createElement("div");
+    tag.className = "tag";
+    tag.textContent = `Question ${i + 1} • ${item.topic}`;
+
+    const heading = document.createElement("h3");
+    heading.textContent = item.q;
+    heading.id = `q${i}-title`;
+
+    card.append(tag, heading);
+
+    item.options.forEach((option, j) => {
+      const label = document.createElement("label");
+      label.className = "option";
+
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = `q${i}`;
+      radio.value = j;
+      radio.addEventListener("change", updateProgress);
+
+      label.append(radio, document.createTextNode(option));
+      card.append(label);
+    });
+
+    const feedback = document.createElement("div");
+    feedback.id = `feedback${i}`;
+    feedback.className = "feedback";
+    feedback.hidden = true;
+    feedback.setAttribute("aria-live", "polite");
+    card.append(feedback);
+    container.append(card);
+  });
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = questions.filter((_, i) =>
+    form.querySelector(`input[name="q${i}"]:checked`)
+  ).length;
+
+  progress.value = answered;
+  progressText.textContent =
+    `${answered} of ${questions.length} questions answered`;
+}
+
+form.addEventListener("submit", event => {
+  event.preventDefault();
+  if (submitted) return;
+
+  const unanswered = questions.filter((_, i) =>
+    !form.querySelector(`input[name="q${i}"]:checked`)
+  ).length;
+
+  if (unanswered > 0) {
+    alert(`Please answer all questions. ${unanswered} remain unanswered.`);
+    const first = questions.findIndex((_, i) =>
+      !form.querySelector(`input[name="q${i}"]:checked`)
+    );
+    form.querySelector(`input[name="q${first}"]`).focus();
+    return;
+  }
+
+  submitted = true;
+  let score = 0;
+
+  questions.forEach((item, i) => {
+    const selected = Number(
+      form.querySelector(`input[name="q${i}"]:checked`).value
+    );
+    const correct = selected === item.answer;
+    if (correct) score++;
+
+    const feedback = document.getElementById(`feedback${i}`);
+    feedback.hidden = false;
+    feedback.className = `feedback ${correct ? "correct" : "incorrect"}`;
+    feedback.textContent =
+      `${correct ? "Correct!" : "Not quite."} ` +
+      `${correct ? "" : "Correct answer: " + item.options[item.answer] + ". "}` +
+      item.explain;
+
+    form.querySelectorAll(`input[name="q${i}"]`)
+      .forEach(input => input.disabled = true);
+  });
+
+  document.getElementById("score").textContent =
+    `You scored ${score} out of ${questions.length} (${score * 10}%).`;
+
+  document.getElementById("message").textContent =
+    score === 10 ? "Excellent work! You got every question right." :
+    score >= 7 ? "Good work! Review any explanations below to strengthen your understanding." :
+    "Keep practising! Review the explanations and try again.";
+
+  result.style.display = "block";
+  document.getElementById("submit").disabled = true;
+  result.focus();
+  result.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+document.getElementById("retry").addEventListener("click", renderQuiz);
+
+renderQuiz();
+</script>
+</body>
+</html>
